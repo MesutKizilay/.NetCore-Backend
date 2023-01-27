@@ -4,6 +4,7 @@ using Business.Constant;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -20,24 +21,28 @@ namespace Business.Concrete
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
+        ICategoryService _categoryService;
 
-        public ProductManager(IProductDal productDal)
+        public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
         //[ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
-            if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
+            IResult result = BusinessRules.Run(CheckIfProductCountOfCategoryCorrect(product.CategoryId),
+                CheckIfProductNameExists(product.ProductName),
+                CheckIfCategoryLimitExceded());
+
+            if (result != null)
             {
-                if (CheckIfProductNameExists(product.ProductName).Success)
-                {
-                    _productDal.Add(product);
-                    return new SuccessResult();
-                }
+                return result;
             }
-            return new ErrorResult();
+
+            _productDal.Add(product);
+            return new SuccessResult(Messages.ProductAdded);
         }
 
         public IDataResult<List<Product>> GetAll()
@@ -73,7 +78,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails(), "helal lan yusufi");
         }
 
-        [ValidationAspect(typeof(ProductValidator))]
+        //[ValidationAspect(typeof(ProductValidator))]
         public IResult Update(Product product)
         {
             throw new NotImplementedException();
@@ -84,7 +89,7 @@ namespace Business.Concrete
             var countOfProducts = _productDal.GetAll(p => p.CategoryId == categoryId);
             if (countOfProducts.Count < 10)
             {
-                return new SuccessResult(Messages.ProductAdded);
+                return new SuccessResult();
             }
             return new ErrorResult(Messages.ProductCountOfCategoryError);
         }
@@ -94,9 +99,19 @@ namespace Business.Concrete
             var result = _productDal.GetAll(p => p.ProductName == productName).Any();
             if (!result)
             {
-                return new SuccessResult(Messages.ProductAdded);
+                return new SuccessResult();
             }
             return new ErrorResult(Messages.ProductNameAlreadyExists);
+        }
+
+        private IResult CheckIfCategoryLimitExceded()
+        {
+            var result=_categoryService.GetAll().Data.Count();
+            if (result>15)
+            {
+                return new ErrorResult(Messages.CategoryLimitExceded);
+            }
+            return new SuccessResult();
         }
     }
 }
