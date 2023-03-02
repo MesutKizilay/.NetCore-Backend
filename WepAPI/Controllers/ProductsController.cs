@@ -51,5 +51,16 @@ namespace WepAPI.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpPost("transaction")]
+        public IActionResult TransactionalOperation(Product product)
+        {
+            var result = _productService.AddTransactionalTest(product);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
     }
 }
