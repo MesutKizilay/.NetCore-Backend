@@ -32,7 +32,7 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-        [SecuredOperation("admin,product.add")]
+        // [SecuredOperation("admin,product.add")]
         [ValidationAspect(typeof(ProductValidator))]
         [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
@@ -126,8 +126,14 @@ namespace Business.Concrete
         public IResult AddTransactionalTest(Product product)
         {
             _productDal.Update(product);
-            //_productDal.Add(product);
+            _productDal.Add(product);
             return new SuccessResult("bi dur bakalım");
+        }
+
+        public IResult Delete(Product product)
+        {
+            _productDal.Delete(product);
+            return new SuccessResult("He sildim guzum");
         }
     }
 }

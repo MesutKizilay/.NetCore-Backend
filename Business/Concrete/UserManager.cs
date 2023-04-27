@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Core.Aspects.Autofac.Validation;
 using Core.Entities.Concrete;
 using DataAccess.Abstract;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Business.Concrete
         {
             return _userDal.GetClaims(user);
         }
-
+    
         public void Add(User user)
         {
             _userDal.Add(user);
