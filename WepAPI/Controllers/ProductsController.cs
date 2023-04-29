@@ -18,11 +18,11 @@ namespace WepAPI.Controllers
         {
             _productService = productService;
         }
-        
+
         [HttpGet("getall")]
         public IActionResult GetAll()
         {
-            var result=_productService.GetAll();
+            var result = _productService.GetAll();
             if (result.Success)
             {
                 return Ok(result);
@@ -51,7 +51,7 @@ namespace WepAPI.Controllers
             }
             return BadRequest(result);
         }
-        
+
         [HttpPost("delete")]
         public IActionResult Delete(Product product)
         {
