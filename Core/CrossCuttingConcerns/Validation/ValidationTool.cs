@@ -19,4 +19,4 @@ namespace Core.CrossCuttingConcerns.Validation
             }
         }
     }
-}
+} 
