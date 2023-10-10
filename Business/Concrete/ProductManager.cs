@@ -4,24 +4,23 @@ using Business.BusinessAspects.Autofac.Caching;
 using Business.Constant;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Exception;
+using Core.Aspects.Autofac.Logging;
 using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
-using Core.CrossCuttingConcerns.Validation;
+using Core.CrossCuttingConcerns.Logging.Log4Net.Loggers;
 using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
-using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
+    [ExceptionLogAspect(typeof(FileLogger))]
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
@@ -33,9 +32,10 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-        // [SecuredOperation("admin,product.add")]
-        [ValidationAspect(typeof(ProductValidator))]
-        [CacheRemoveAspect("IProductService.Get")]
+        //[SecuredOperation("admin,product.add")]
+        //[ValidationAspect(typeof(ProductValidator))]
+        //[CacheRemoveAspect("IProductService.Get")]
+        //[LogAspect(typeof(FileLogger))]
         public IResult Add(Product product)
         {
             IResult result = BusinessRules.Run(CheckIfProductCountOfCategoryCorrect(product.CategoryId),
@@ -51,6 +51,7 @@ namespace Business.Concrete
             return new SuccessResult(Messages.ProductAdded);
         }
 
+        [LogAspect(typeof(FileLogger))]
         [CacheAspect]
         public IDataResult<List<Product>> GetAll()
         {
@@ -67,7 +68,8 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id));
         }
 
-        [CacheAspect]
+        //[CacheAspect]
+        //[LogAspect(typeof(FileLogger))]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productDal.Get(x => x.ProductId == productId));
