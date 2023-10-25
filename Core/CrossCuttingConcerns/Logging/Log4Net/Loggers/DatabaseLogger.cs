@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.CrossCuttingConcerns.Logging.Log4Net.Loggers
 {
-    public class DatabaseLogger : LoggerServiceBase
+    public class DatabaseLogger : Log4NetServiceBase
     {
         public DatabaseLogger() : base("DatabaseLogger")
         {

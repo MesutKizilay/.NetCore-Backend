@@ -8,19 +8,22 @@ using Core.Aspects.Autofac.Exception;
 using Core.Aspects.Autofac.Logging;
 using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
-using Core.CrossCuttingConcerns.Logging.Log4Net.Loggers;
+using Core.CrossCuttingConcerns.Logging.SeriLog.Loggers;
+//using Core.CrossCuttingConcerns.Logging.Log4Net.Loggers;
 using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Business.Concrete
 {
-    [ExceptionLogAspect(typeof(FileLogger))]
+    //[LogAspect(typeof(FileLogger))]
+    //[ExceptionLogAspect(typeof(FileLogger))]
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
@@ -51,8 +54,8 @@ namespace Business.Concrete
             return new SuccessResult(Messages.ProductAdded);
         }
 
-        [LogAspect(typeof(FileLogger))]
-        [CacheAspect]
+        //[LogAspect(typeof(FileLogger))]
+        //[CacheAspect]
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 2)

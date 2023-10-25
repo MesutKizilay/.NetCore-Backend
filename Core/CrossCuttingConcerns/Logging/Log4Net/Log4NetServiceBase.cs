@@ -10,11 +10,11 @@ using System.Xml;
 
 namespace Core.CrossCuttingConcerns.Logging.Log4Net
 {
-    public class LoggerServiceBase
+    public class Log4NetServiceBase
     {
         private ILog _log;
 
-        public LoggerServiceBase(string name)
+        public Log4NetServiceBase(string name)
         {
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.Load(File.OpenRead("log4net.config"));

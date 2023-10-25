@@ -4,30 +4,47 @@ using Core.CrossCuttingConcerns.Logging;
 using Core.Utilities.Interceptors;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Core.Utilities.Messages;
+using Core.CrossCuttingConcerns.Logging.SeriLog;
+using System.Text.Json;
 
 namespace Core.Aspects.Autofac.Logging
 {
     public class LogAspect : MethodInterception
     {
-        private LoggerServiceBase _loggerServiceBase;
+        private readonly Log4NetServiceBase _log4NetServiceBase;
+        private readonly SeriLogServiceBase _seriLogServiceBase;
+        private readonly Type _type;
 
         public LogAspect(Type loggerService)
         {
-            if (loggerService.BaseType != typeof(LoggerServiceBase))
+            _type = loggerService;
+
+
+            if (loggerService.BaseType != typeof(Log4NetServiceBase) && loggerService.BaseType != typeof(SeriLogServiceBase))
             {
                 throw new System.Exception(AspectMessages.WrongLoggerType);
             }
-
-            _loggerServiceBase = (LoggerServiceBase)Activator.CreateInstance(loggerService);
+            else if (loggerService.BaseType == typeof(Log4NetServiceBase))
+            {
+                _log4NetServiceBase = (Log4NetServiceBase)Activator.CreateInstance(loggerService);
+            }
+            else
+            {
+                _seriLogServiceBase = (SeriLogServiceBase)Activator.CreateInstance(loggerService);
+            }
         }
 
-        protected override void OnBefore(IInvocation invocation)
+        protected override void OnException(IInvocation invocation, System.Exception e)
         {
-            _loggerServiceBase.Info(GetLogDetail(invocation));
+            if (_type.BaseType == typeof(Log4NetServiceBase))
+            {
+                _log4NetServiceBase.Info(GetLogDetail(invocation));
+            }
+            else
+            {
+                _seriLogServiceBase.Info(JsonSerializer.Serialize(GetLogDetail(invocation)));
+            }
         }
 
         private LogDetail GetLogDetail(IInvocation invocation)

@@ -8,28 +8,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.CrossCuttingConcerns.Logging.SeriLog;
+using System.Text.Json;
 
 namespace Core.Aspects.Autofac.Exception
 {
     public class ExceptionLogAspect : MethodInterception
     {
-        private LoggerServiceBase _loggerServiceBase;
+        private readonly Log4NetServiceBase _log4NetServiceBase;
+        private readonly SeriLogServiceBase _seriLogServiceBase;
+        private readonly Type _type;
 
         public ExceptionLogAspect(Type loggerService)
         {
-            if (loggerService.BaseType != typeof(LoggerServiceBase))
+            _type = loggerService;
+
+
+            if (loggerService.BaseType != typeof(Log4NetServiceBase) && loggerService.BaseType != typeof(SeriLogServiceBase))
             {
                 throw new System.Exception(AspectMessages.WrongLoggerType);
             }
-
-            _loggerServiceBase = (LoggerServiceBase)Activator.CreateInstance(loggerService);
+            else if (loggerService.BaseType == typeof(Log4NetServiceBase))
+            {
+                _log4NetServiceBase = (Log4NetServiceBase)Activator.CreateInstance(loggerService);
+            }
+            else
+            {
+                _seriLogServiceBase = (SeriLogServiceBase)Activator.CreateInstance(loggerService);
+            }
         }
 
         protected override void OnException(IInvocation invocation, System.Exception e)
         {
             LogDetailWithException logDetailWithException = GetLogDetail(invocation);
             logDetailWithException.ExceptionMessage = e.Message;
-            _loggerServiceBase.Error(logDetailWithException);
+
+            if (_type.BaseType == typeof(Log4NetServiceBase))
+            {
+                _log4NetServiceBase.Error(logDetailWithException);
+            }
+            else
+            {
+                _seriLogServiceBase.Error(JsonSerializer.Serialize(logDetailWithException));
+            }
         }
 
         private LogDetailWithException GetLogDetail(IInvocation invocation)
