@@ -17,7 +17,7 @@ namespace DataAccess.Concrete.EntityFramework
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=DESKTOP-8DD9NIJ;Database=Northwind;Trusted_Connection=true");
+            optionsBuilder.UseSqlServer("Server=DESKTOP-D0DS4EK\\SQLEXPRESS;Database=Northwind;Trusted_Connection=true");
             //optionsBuilder.UseInMemoryDatabase("RentACar");
         }
 

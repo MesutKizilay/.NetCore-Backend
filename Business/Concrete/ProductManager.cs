@@ -6,6 +6,7 @@ using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Caching;
 using Core.Aspects.Autofac.Exception;
 using Core.Aspects.Autofac.Logging;
+using Core.Aspects.Autofac.Performance;
 using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Logging.SeriLog.Loggers;
@@ -55,7 +56,8 @@ namespace Business.Concrete
         }
 
         //[LogAspect(typeof(FileLogger))]
-        //[CacheAspect]
+        [CacheAspect]
+        //[PerformanceAspect(10)]
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 2)
@@ -96,7 +98,8 @@ namespace Business.Concrete
         [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product)
         {
-            throw new NotImplementedException();
+            _productDal.Update(product);
+            return new SuccessResult();
         }
 
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)

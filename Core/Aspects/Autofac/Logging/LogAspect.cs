@@ -35,7 +35,7 @@ namespace Core.Aspects.Autofac.Logging
             }
         }
 
-        protected override void OnException(IInvocation invocation, System.Exception e)
+        protected override void OnBefore(IInvocation invocation)
         {
             if (_type.BaseType == typeof(Log4NetServiceBase))
             {

@@ -12,5 +12,20 @@ namespace Core.Utilities.Interceptors
         {
 
         }
+
+        public void InterceptAsynchronous(IInvocation invocation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void InterceptAsynchronous<TResult>(IInvocation invocation)
+        {
+
+        }
+
+        public void InterceptSynchronous(IInvocation invocation)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
